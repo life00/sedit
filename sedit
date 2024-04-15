@@ -46,9 +46,9 @@ else
 	diff --color "${1}" "${td}"/edit || true
 	# confirming changes
 	printf "Continue? [y/N]: "
-	read -n1 r
+	read -r r
 	printf "\n"
-	if [[ "${r}" == "y" || "${r}" == "Y" ]]; then
+	if [ "${r}" = "y" ] || [ "${r}" = "Y" ]; then
 		cat "${td}"/edit >"${1}"
 		exit 0
 	else
