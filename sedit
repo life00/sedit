@@ -16,6 +16,8 @@ elif [ "$(id -u)" -ne 0 ]; then
 	exit 1
 fi
 
+# exit if any code errors
+# error when using unset variables
 set -eu
 
 # temporary directory
@@ -49,6 +51,7 @@ else
 	read -r resp
 	printf "\n"
 	if [ "${resp}" = "y" ] || [ "${resp}" = "Y" ]; then
+		# overwrite the original file
 		cat "${tmpdir}"/edit >"${1}"
 		exit 0
 	else
