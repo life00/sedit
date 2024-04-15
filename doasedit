@@ -1,44 +1,57 @@
 #!/bin/sh
+
+# setting environment variables
+user="user"
+EDITOR="${EDITOR:-/bin/vi}"
+
+# error checking
 if [ -n "${2}" ]; then
-	printf 'Expected only one argument\n'
+	printf "Expected only one argument\n"
 	exit 1
 elif [ -z "${1}" ]; then
-	printf 'No file path provided\n'
+	printf "No file path provided\n"
 	exit 1
-elif [ "$(id -u)" -eq 0 ]; then
-	printf 'Cannot be run as root\n'
+elif [ "$(id -u)" -ne 0 ]; then
+	printf "Should be run as root\n"
 	exit 1
 fi
 
 set -eu
 
-tempdir="$(mktemp -d)"
+# temporary directory
+td="$(mktemp -d)"
 
-trap 'rm -rf $tempdir' EXIT
-srcfile="$(doas realpath "$1")"
+# remove temporary directory when script exits
+trap "rm -rf '${td}'" EXIT
 
-if doas [ -f "$srcfile" ]; then
-	doas cp -a "$srcfile" "$tempdir"/file
-	doas cp -a "$tempdir"/file "$tempdir"/edit
+# copy file and set appropriate permissions
+cp -a "${1}" "${td}"/edit
+chown -R "${user}":"${user}" "${td}"
+chmod 600 "${td}"/edit
 
-	# make sure that the file is editable by user
-	doas chown "$USER":"$USER" "$tempdir"/edit
-	chmod 600 "$tempdir"/edit
-else
-	# create file with "regular" system permissions (root:root 644)
-	touch "$tempdir"/file
-	doas chown root:root "$tempdir"/file
-fi
+# open file in ${EDITOR} as ${user} using su
+su "${user}" -s /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${td}"/edit
 
-$EDITOR "$tempdir"/edit
-
-doas tee "$tempdir"/file 1>/dev/null < "$tempdir"/edit
-
-if doas cmp -s "$tempdir/file" "$srcfile"; then
-	printf 'Skipping write; no changes.\n'
+# checking for changes
+# the original file is not copied to temporary directory because I believe it is unnecessary
+# it is not expected that something overwrites the original file during editing
+# if something does then it will be visible in the diff
+if cmp -s "${td}"/edit "${1}"; then
+	printf "Skipping write; no changes.\n"
 	exit 0
 else
-	doas mv -f "$tempdir"/file "$srcfile"
-	exit 0
+	# provide a diff of changes
+	printf "Changes made:\n"
+	# suppress error code response of diff
+	diff --color "${1}" "${td}"/edit || true
+	# confirming changes
+	printf "Continue? [y/N]: "
+	read -n1 r
+	printf "\n"
+	if [[ "${r}" == "y" || "${r}" == "Y" ]]; then
+		cat "${td}"/edit >"${1}"
+		exit 0
+	else
+		exit 1
+	fi
 fi
-
