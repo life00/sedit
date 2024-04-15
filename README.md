@@ -34,7 +34,7 @@ In addition to that, considering the security assumption regarding the unprivile
 
 ## Usage
 
-Before using the program you are strongly encouraged to read the documentation (this readme) and the [code itself](./sedit) to fully understand how it works. After doing so you may proceed with the following installation steps:
+Before using `sedit` you are strongly advised to read the documentation (this readme) and the [code itself](./sedit) to fully understand how it works. After doing so you may proceed with the following installation steps:
 
 1. Clone the repository into your current working directory: `git clone https://github.com/life00/sedit`
 2. Copy the executable to `/usr/sbin` or `/usr/local/sbin`: `cp ./sedit/sedit /usr/local/sbin/`
