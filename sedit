@@ -19,37 +19,37 @@ fi
 set -eu
 
 # temporary directory
-td="$(mktemp -d)"
+tmpdir="$(mktemp -d)"
 
 # remove temporary directory when script exits
-trap "rm -rf '${td}'" EXIT
+trap "rm -rf '${tmpdir}'" EXIT
 
 # copy file and set appropriate permissions
-cp -a "${1}" "${td}"/edit
-chown -R "${user}":"${user}" "${td}"
-chmod 600 "${td}"/edit
+cp -a "${1}" "${tmpdir}"/edit
+chown -R "${user}":"${user}" "${tmpdir}"
+chmod 600 "${tmpdir}"/edit
 
 # open file in ${EDITOR} as ${user} using su
-su "${user}" -s /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${td}"/edit
+su "${user}" -s /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
 
 # checking for changes
 # the original file is not copied to temporary directory because I believe it is unnecessary
 # it is not expected that something overwrites the original file during editing
 # if something does then it will be visible in the diff
-if cmp -s "${td}"/edit "${1}"; then
+if cmp -s "${tmpdir}"/edit "${1}"; then
 	printf "Skipping write; no changes.\n"
 	exit 0
 else
 	# provide a diff of changes
 	printf "Changes made:\n"
 	# suppress error code response of diff
-	diff --color "${1}" "${td}"/edit || true
+	diff --color "${1}" "${tmpdir}"/edit || true
 	# confirming changes
 	printf "Continue? [y/N]: "
-	read -r r
+	read -r resp
 	printf "\n"
-	if [ "${r}" = "y" ] || [ "${r}" = "Y" ]; then
-		cat "${td}"/edit >"${1}"
+	if [ "${resp}" = "y" ] || [ "${resp}" = "Y" ]; then
+		cat "${tmpdir}"/edit >"${1}"
 		exit 0
 	else
 		exit 1
