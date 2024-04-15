@@ -51,6 +51,10 @@ sedit ./path/to/file
 
 The program expects the user to provide only one argument as a valid path to an existing file. This means that you can only edit existing files using this program, otherwise you will have to first create it by simply `touch ./path/to/file` before opening it with `sedit`.
 
+## Contribution
+
+I think that this project is mostly complete because of its small scale, however if you believe there is something that should be added and / or fixed then feel free to create an issue or a pull request for me to review.
+
 ## Credits
 
 I would like to thank the original author of [doasedit](https://github.com/TinfoilSubmarine/doasedit), [Joel Beckmeyer](https://github.com/TinfoilSubmarine) for creating such a concisely written minimal program on which code this project is based on. The [original project license](https://github.com/TinfoilSubmarine/doasedit/blob/main/LICENSE) is BSD 2-Clause License which is also used for this project and [included in the source code](./LICENSE).
