@@ -82,6 +82,21 @@ sedit ./path/to/file
 
 The program expects the user to provide only one argument as a valid path to an existing file. This means that you can only edit existing files using this program, otherwise you will have to first create it by simply `touch ./path/to/file` before opening it with `sedit`.
 
+### Using GUI editor
+
+With the default launching method of `machinectl` the GUI editor might not work out of the box because of lacking display environment variables. To fix that it would be necessary for you to identify all the require environment variables for a GUI application to run on your system. For example I use wayland and there are several variables that need to be set for GUI applications to know how to launch. For me those include the following: `XDG_SESSION_TYPE`, `WAYLAND_DISPLAY`, `DISPLAY`, `XDG_RUNTIME_DIR`.
+
+After you identified those variables you need to figure out how to set them so that the created environment by `machinectl` picks them up. For me it was just exporting them with the right values (check what they are in regular session, they usually don't change) in `/etc/zshenv` (file location depends on the system shell you use, I use zsh):
+
+```sh
+export XDG_SESSION_TYPE="wayland"
+export WAYLAND_DISPLAY="wayland-1"
+export DISPLAY=":0"
+export XDG_RUNTIME_DIR="/run/user/1000"
+```
+
+After this everything should hopefully work. If you are having difficulties feel free to open an issue.
+
 ## Contribution
 
 I think that this project is mostly complete because of its small scale, however if you believe there is something that should be added and / or fixed then feel free to create an issue or a pull request for me to review.
