@@ -28,11 +28,19 @@ trap "rm -rf '${tmpdir}'" EXIT
 
 # copy file and set appropriate permissions
 cp -a "${1}" "${tmpdir}"/edit
-chown -R "${user}":"${user}" "${tmpdir}"
+chown "${user}":"${user}" "${tmpdir}"
+chown "${user}":"${user}" "${tmpdir}"/edit
+chmod 700 "${tmpdir}"
 chmod 600 "${tmpdir}"/edit
 
 # open file in ${EDITOR} as ${user} using su
 su "${user}" -s /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
+
+# reverse permission changes
+chown "root:root" "${tmpdir}"
+chown "root:root" "${tmpdir}"/edit
+chmod 700 "${tmpdir}"
+chmod 600 "${tmpdir}"/edit
 
 # checking for changes
 # the original file is not copied to temporary directory because I believe it is unnecessary
