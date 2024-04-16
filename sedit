@@ -36,16 +36,16 @@ chmod 600 "${tmpdir}"/edit
 # open file in ${EDITOR} as ${user}
 
 # use machinectl if you are on a systemd system (recommended); arguably it is the most secure method
-machinectl shell "${user}"@.host "${EDITOR}" "${tmpdir}"/edit #
+machinectl shell "${user}"@.host "${EDITOR}" "${tmpdir}"/edit
 
 # use GNU su when you are using GNU coreutils; arguably it is less secure method
-# su "${user}" -P -s /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit #
+# su "${user}" -P -s /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
 
 # use sudo if you have it installed; its about the same security as using su
 # IMPORTANT: make sure you have 1.9.14< version installed so that use_pty is used by default
 # otherwise using sudo to spawn unprivileged session is NOT SAFE and is vulnerable to privilege escalation exploit
 # the default state of this option might change in the future versions so its better to set it explicitly in the config anyways
-# sudo -u "${user}" /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit # similar to su in terms of security
+# sudo -u "${user}" /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
 
 # reverse permission changes
 chown "root:root" "${tmpdir}"
