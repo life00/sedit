@@ -55,7 +55,7 @@ I have addressed this problem by choosing the `machinectl` method as default, wh
 
 - POSIX-compliant system
 - launching program options
-  - systemd: `machinectl` (default and recommended)
+  - `systemd-container`: `machinectl` (default and recommended)
   - GNU core utils: `su`
   - `sudo`
 
@@ -70,7 +70,7 @@ Before using `sedit` you are strongly advised to read the documentation (this re
    - `EDITOR` - the editor that will be used to edit the file
      - if the environment variable is already set then it will use it
 4. Choose your preferred launching program by (un)commenting sections of the code if necessary: `vi /usr/local/sbin/sedit`
-   - systemd: `machinectl` (default and recommended)
+   - `systemd-container`: `machinectl` (default and recommended)
    - GNU `su`
    - `sudo`
 
