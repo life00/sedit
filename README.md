@@ -24,7 +24,10 @@ A minimal POSIX shell script[^2] that allows you to securely edit any file as ro
 
 It is important to mention that I personally do not use this program because I don't frequently edit root owned files, and generally I have some doubts about the fundamental concept. I believe that the fundamental idea of editing a root owned file with an unprivileged editor does not really sound very secure, and it opens up a lot of potential for exploitation. I have created this project only as a proof of concept, however it does not mean it is unmaintained or insecure. With this project I am trying to achieve the most secure implementation of this idea, however you still should consider the risk and the fact that **I provide no guarantees**. In case you believe there is an issue with the code do not hesitate to contact me (see my [profile](https://github.com/life00) for contact info).
 
-Since the initial release I have fixed `2` vulnerabilities in SEdit.
+Since the initial release I have fixed `2` vulnerabilities in SEdit:
+
+- `b2c3e97`
+- `58c3ea1`
 
 ## Design
 
@@ -44,7 +47,7 @@ By far the hardest challenge was to figure out how to securely launch and proper
 
 The vulnerability is officially called _TTY pushback_ which is essentially about somehow escaping the unprivileged shell to the original root shell by exploiting the weaknesses in the environment. You may read more details about this in [these](https://www.halfdog.net/Security/2012/TtyPushbackPrivilegeEscalation/) [two](https://www.errno.fr/TTYPushback.html) articles. In the second article the solution presented is to use the `-P` argument for `su`, which solves this particular issue however it does solve the fundamental problem. In [one issue](https://github.com/systemd/systemd/issues/7451#issuecomment-346787237) poettering has suggested that the proper way of creating a clean environment is to use `machinectl shell` because the only right way a fully isolated session may be created is by the init system. I would probably agree with this statement given that is the core of the system that manages all the sessions, which also means that using `su` and similar to create an unprivileged session from privileged session may be fundamentally a bad idea.
 
-After a bit more research I discovered that the same TTY pushback issue applies to [sudo](https://www.suse.com/support/kb/doc/?id=000021241) and [doas] where sudo [has a solution to this](https://github.com/sudo-project/sudo/issues/258) which is enabled by default while doas still does not.
+After a bit more research I discovered that the same TTY pushback issue applies to [sudo](https://www.suse.com/support/kb/doc/?id=000021241) and [doas](https://github.com/Duncaen/OpenDoas/issues/106) where sudo [has a solution to this](https://github.com/sudo-project/sudo/issues/258) which is enabled by default while doas still does not.
 
 I have addressed this problem by choosing the `machinectl` method as default, which means by default SEdit is dependent on systemd. I have also created an implementation for GNU `su` (but with `-P` argument) and `sudo` (it has this option enabled by default from 1.9.14 version, but users are still encouraged to enable `use_pty` option explicitly in config in case the default state changes in future versions), but this code is commented out by default. Users may choose which launching method they prefer, however I believe `machinectl` is the most secure method which is why it is the default. freedumbo has also suggested to use an ssh server to securely run the untrusted editor, however I believe this would require too much setup and don't think client OS's usually have an ssh server running (SEdit would probably be used more in client OS's), so I did not implement this option.
 
@@ -90,5 +93,5 @@ I would like to thank the original author of [doasedit](https://github.com/Tinfo
 Also, special thanks to all the volunteers and code reviewers that contributed to this project:
 
 - @freedumbo:arcticfoxes.net (on matrix)
-  - reported race condition critical vulnerability: `b2c3e97`, `efa14e0`
-  - reported TTY pushback critical vulnerability: `58c3ea1`
+  - reported TTY pushback critical vulnerability: `b2c3e97`, `efa14e0`
+  - reported race condition critical vulnerability: `58c3ea1`
