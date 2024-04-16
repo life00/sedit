@@ -34,7 +34,7 @@ chmod 700 "${tmpdir}"
 chmod 600 "${tmpdir}"/edit
 
 # open file in ${EDITOR} as ${user} using su
-su "${user}" -s /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
+su "${user}" -P -s /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
 
 # reverse permission changes
 chown "root:root" "${tmpdir}"
