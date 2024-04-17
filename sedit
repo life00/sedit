@@ -3,16 +3,17 @@
 # setting environment variables
 user="user"
 EDITOR="${EDITOR:-/bin/vi}"
+vcode="" # validity passcode to verify the session
 
 # error checking
 if [ -n "${2}" ]; then
-	printf "Expected only one argument\n"
+	printf "%s Expected only one argument\n" "${passcode}"
 	exit 1
 elif [ -z "${1}" ]; then
-	printf "No file path provided\n"
+	printf "%s No file path provided\n" "${passcode}"
 	exit 1
 elif [ "$(id -u)" -ne 0 ]; then
-	printf "Should be run as root\n"
+	printf "%s Should be run as root\n" "${passcode}"
 	exit 1
 fi
 
@@ -61,15 +62,15 @@ cat "${tmpdir}"/edit >"${tmpdir}"/final
 # it is not expected that something overwrites the original file during editing
 # if something does then it will be visible in the diff
 if cmp -s "${tmpdir}"/edit "${1}"; then
-	printf "Skipping write; no changes.\n"
+	printf "%s Skipping write; no changes.\n" "${passcode}"
 	exit 0
 else
 	# provide a diff of changes
-	printf "Changes made:\n"
+	printf "%s Changes made:\n" "${passcode}"
 	# suppress error code response of diff
 	diff --color "${1}" "${tmpdir}"/final || true
 	# confirming changes
-	printf "Continue? [y/N]: "
+	printf "%s Continue? [y/N]: " "${passcode}"
 	read -r resp
 	printf "\n"
 	if [ "${resp}" = "y" ] || [ "${resp}" = "Y" ]; then
