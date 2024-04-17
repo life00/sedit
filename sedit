@@ -7,6 +7,7 @@ vcode="" # validity passcode to verify the session
 
 # define colors for logging
 nc="\e[0m"
+bold="\e[1m"
 red="\e[1;31m"
 green="\e[1;32m"
 blue="\e[1;34m"
@@ -78,9 +79,9 @@ else
 	# suppress error code response of diff
 	diff --color "${1}" "${tmpdir}"/final || true
 	# confirming changes
-	printf "${dgray}[${blue}?${dgray}] :${lgray}%s${dgray}:${nc} Continue? [${green}y${nc}/${red}N${nc}]: " "${vcode}"
+	printf "${dgray}[${blue}?${dgray}] :${lgray}%s${dgray}:${nc} Continue? [${green}y${nc}/${red}N${nc}]: ${bold}" "${vcode}"
 	read -r resp
-	printf "\n"
+	printf "${nc}\n"
 	if [ "${resp}" = "y" ] || [ "${resp}" = "Y" ]; then
 		# overwrite the original file
 		cat "${tmpdir}"/final >"${1}"
