@@ -39,7 +39,9 @@ In this project I have addressed several such issues by having a different runti
 
 In addition to that, considering the security assumption regarding the unprivileged editor it was necessary to also provide validation that the saved root owned file is not tampered with anything. I have approached this problem by including a brief prompt with a diff output if a user wants to apply the changes. Even though this may not be the cleanest solution, I believe it provides reasonable validation.
 
-Furthermore, thanks to the minimal, concise, and POSIX-compliant code of the [original project](https://github.com/TinfoilSubmarine/doasedit) SEdit code is also pretty minimal and very readable. Even though SEdit is also POSIX-compliant it is dependent on an external program to securely launch an unprivileged user session for the editor. This compromise has been made because there does not appear to be any other better and secure solution. This is further discussed in the following subsection.
+Another optional feature of SEdit is using so called _validity passcode_ to verify the current session. Its aim is to prevent a theoretical attack where a malicious editor will fake the end of the session and act as a root shell to possibly retrieve sensitive information from users input. The solution was suggested by freedumbo (@freedumbo:arcticfoxes.net) for the user of SEdit to set a validity verification passcode variable in the source code that will be outputted together with each log entry. The idea is that the threat actor doesn't know the passcode and is not able to fake the session as long as the passcode is reasonably secure and not compromised. The user is supposed to check that passcode after the end of each session. The passcode is defined as `vcode` in the source code, but by default its an empty string. Storing the passcode in plain text in the source code is not a concern because the entire point is to prevent privilege escalation while root environment is trusted. Also every validity passcode should be unique for each SEdit installation, and it should not be used for anything else.
+
+Thanks to the minimal, concise, and POSIX-compliant code of the [original project](https://github.com/TinfoilSubmarine/doasedit) SEdit code is also pretty minimal and very readable. Even though SEdit is also POSIX-compliant it is dependent on an external program to securely launch an unprivileged user session for the editor. This compromise has been made because there does not appear to be any other better and secure solution. This is further discussed in the following subsection.
 
 ### Securely launching the editor
 
@@ -65,11 +67,16 @@ Before using `sedit` you are strongly advised to read the documentation (this re
 
 1. Clone the repository into your current working directory: `git clone https://github.com/life00/sedit`
 2. Copy the executable to `/usr/sbin` or `/usr/local/sbin`: `cp ./sedit/sedit /usr/local/sbin/`
-3. Configure the environment variables in the executable using your preferred editor: `vi /usr/local/sbin/sedit`
+3. Set appropriate permissions for the binary: `chown root:root /usr/local/sbin/sedit; chmod 700 /usr/local/sbin/sedit`
+   - this is necessary when you are using validity passcode functionality
+   - the script is supposed to be accessible only by root anyways
+4. Configure the environment variables in the executable using your preferred editor: `vi /usr/local/sbin/sedit`
    - `user` - the unprivileged user the editor will run as
    - `EDITOR` - the editor that will be used to edit the file
      - if the environment variable is already set then it will use it
-4. Choose your preferred launching program by (un)commenting sections of the code if necessary: `vi /usr/local/sbin/sedit`
+   - `vcode` - the validity passcode to verify the validity of the session
+     - it is set by the user, and it is supposed to be a temporary passcode specifically used for SEdit
+5. Choose your preferred launching program by (un)commenting sections of the code if necessary: `vi /usr/local/sbin/sedit`
    - `systemd-container`: `machinectl` (default and recommended)
    - GNU `su`
    - `sudo`
