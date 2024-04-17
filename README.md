@@ -117,3 +117,5 @@ Also, special thanks to all the volunteers and code reviewers that contributed t
 - @freedumbo:arcticfoxes.net (on matrix)
   - reported TTY pushback critical vulnerability: `b2c3e97`, `efa14e0`
   - reported race condition critical vulnerability: `58c3ea1`
+  - suggested better permission management of temporary directory and files: `3f43782`
+  - suggested validity passcode security feature: `3a18fae`
