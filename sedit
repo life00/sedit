@@ -46,7 +46,7 @@ cat "${1}" >"${tmpdir}"/edit
 # open file in ${EDITOR} as ${user}
 
 # use machinectl if you are on a systemd system (recommended); arguably it is the most secure method
-machinectl shell "${user}"@.host "${EDITOR}" "${tmpdir}"/edit
+machinectl -q shell "${user}"@.host "${EDITOR}" "${tmpdir}"/edit
 
 # use GNU su when you are using GNU coreutils; arguably it is less secure method
 # su "${user}" -P -s /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
