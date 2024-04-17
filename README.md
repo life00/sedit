@@ -24,10 +24,12 @@ A minimal POSIX shell script[^2] that allows you to securely edit any file as ro
 
 It is important to mention that I personally do not use this program because I don't frequently edit root owned files, and generally I have some doubts about the fundamental concept. I believe that the fundamental idea of editing a root owned file with an unprivileged editor does not really sound very secure, and it opens up a lot of potential for exploitation. I have created this project only as a proof of concept, however it does not mean it is unmaintained or insecure. With this project I am trying to achieve the most secure implementation of this idea, however you still should consider the risk and the fact that **I provide no guarantees**. In case you believe there is an issue with the code do not hesitate to contact me (see my [profile](https://github.com/life00) for contact info).
 
-Since the initial release I have fixed `2` vulnerabilities in SEdit:
+Since the initial release I have fixed `4` security issues in SEdit:
 
 - `b2c3e97`
 - `58c3ea1`
+- `3f43782`
+- `3a18fae`
 
 ## Design
 
