@@ -27,11 +27,11 @@ tmpdir="$(mktemp -d)"
 trap "rm -rf '${tmpdir}'" EXIT
 
 # copy file and set appropriate permissions
-cp -a "${1}" "${tmpdir}"/edit
-chown "${user}":"${user}" "${tmpdir}"
-chown "${user}":"${user}" "${tmpdir}"/edit
-chmod 700 "${tmpdir}"
+chmod 755 "${tmpdir}"
+touch "${tmpdir}"/edit
 chmod 600 "${tmpdir}"/edit
+chown "${user}":"${user}" "${tmpdir}"/edit
+cat "${1}" >"${tmpdir}"/edit
 
 # open file in ${EDITOR} as ${user}
 
@@ -48,10 +48,13 @@ machinectl shell "${user}"@.host "${EDITOR}" "${tmpdir}"/edit
 # sudo -u "${user}" /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
 
 # reverse permission changes
-chown "root:root" "${tmpdir}"
-chown "root:root" "${tmpdir}"/edit
+# creating a separate file to prevent a potential attack using uncommon ACLs
 chmod 700 "${tmpdir}"
+touch "${tmpdir}"/final
+chmod 600 "${tmpdir}"/final
+chown "root:root" "${tmpdir}"/edit
 chmod 600 "${tmpdir}"/edit
+cat "${tmpdir}"/edit >"${tmpdir}"/final
 
 # checking for changes
 # the original file is not copied to temporary directory because I believe it is unnecessary
@@ -64,14 +67,14 @@ else
 	# provide a diff of changes
 	printf "Changes made:\n"
 	# suppress error code response of diff
-	diff --color "${1}" "${tmpdir}"/edit || true
+	diff --color "${1}" "${tmpdir}"/final || true
 	# confirming changes
 	printf "Continue? [y/N]: "
 	read -r resp
 	printf "\n"
 	if [ "${resp}" = "y" ] || [ "${resp}" = "Y" ]; then
 		# overwrite the original file
-		cat "${tmpdir}"/edit >"${1}"
+		cat "${tmpdir}"/final >"${1}"
 		exit 0
 	else
 		exit 1
