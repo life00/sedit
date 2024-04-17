@@ -7,13 +7,13 @@ vcode="" # validity passcode to verify the session
 
 # error checking
 if [ -n "${2}" ]; then
-	printf "%s Expected only one argument\n" "${vcode}"
+	printf "[!] :%s: Expected only one argument\n" "${vcode}"
 	exit 1
 elif [ -z "${1}" ]; then
-	printf "%s No file path provided\n" "${vcode}"
+	printf "[!] :%s: No file path provided\n" "${vcode}"
 	exit 1
 elif [ "$(id -u)" -ne 0 ]; then
-	printf "%s Should be run as root\n" "${vcode}"
+	printf "[!] :%s: Should be run as root\n" "${vcode}"
 	exit 1
 fi
 
@@ -62,15 +62,15 @@ cat "${tmpdir}"/edit >"${tmpdir}"/final
 # it is not expected that something overwrites the original file during editing
 # if something does then it will be visible in the diff
 if cmp -s "${tmpdir}"/edit "${1}"; then
-	printf "%s Skipping write; no changes.\n" "${vcode}"
+	printf "[+] :%s: Skipping write; no changes.\n" "${vcode}"
 	exit 0
 else
 	# provide a diff of changes
-	printf "%s Changes made:\n" "${vcode}"
+	printf "[+] :%s: Changes made:\n" "${vcode}"
 	# suppress error code response of diff
 	diff --color "${1}" "${tmpdir}"/final || true
 	# confirming changes
-	printf "%s Continue? [y/N]: " "${vcode}"
+	printf "[?] :%s: Continue? [y/N]: " "${vcode}"
 	read -r resp
 	printf "\n"
 	if [ "${resp}" = "y" ] || [ "${resp}" = "Y" ]; then
