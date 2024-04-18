@@ -16,13 +16,13 @@ lgray="\e[0;97m"
 
 # error checking
 if [ -n "${2}" ]; then
-	printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} Expected only one argument\n" "${vcode}"
+	printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} Expected only one argument.\n" "${vcode}"
 	exit 1
 elif [ -z "${1}" ]; then
-	printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} No file path provided\n" "${vcode}"
+	printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} No file path provided.\n" "${vcode}"
 	exit 1
 elif [ "$(id -u)" -ne 0 ]; then
-	printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} Should be run as root\n" "${vcode}"
+	printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} Should be run as root.\n" "${vcode}"
 	exit 1
 fi
 
