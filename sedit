@@ -70,16 +70,14 @@ cat "${tmpdir}"/edit >"${tmpdir}"/final
 # the original file is not copied to temporary directory because I believe it is unnecessary
 # it is not expected that something overwrites the original file during editing
 # if something does then it will be visible in the diff
-if cmp -s "${tmpdir}"/edit "${1}"; then
-	printf "${dgray}[${green}+${dgray}] :${lgray}%s${dgray}:${nc} Skipping write; no changes.\n" "${vcode}"
+
+# check difference with diff and also use its output
+if diff --color "${1}" "${tmpdir}"/final; then
+	printf "${dgray}[${green}+${dgray}] :${lgray}%s${dgray}:${nc} No changes made.\n" "${vcode}"
 	exit 0
 else
-	# provide a diff of changes
-	printf "${dgray}[${green}+${dgray}] :${lgray}%s${dgray}:${nc} Changes made:\n" "${vcode}"
-	# suppress error code response of diff
-	diff --color "${1}" "${tmpdir}"/final || true
 	# confirming changes
-	printf "${dgray}[${blue}?${dgray}] :${lgray}%s${dgray}:${nc} Continue? [${green}y${nc}/${red}N${nc}]: ${bold}" "${vcode}"
+	printf "${dgray}[${blue}?${dgray}] :${lgray}%s${dgray}:${nc} Apply changes? ${dgray}[${green}y${dgray}/${red}N${dgray}]: ${bold}" "${vcode}"
 	read -r resp
 	printf "${nc}\n"
 	if [ "${resp}" = "y" ] || [ "${resp}" = "Y" ]; then
