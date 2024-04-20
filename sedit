@@ -58,7 +58,7 @@ machinectl -q shell "${user}"@.host "${EDITOR}" "${tmpdir}"/edit
 # sudo -u "${user}" /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
 
 # reverse permission changes
-# creating a separate file to prevent a potential attack using uncommon ACLs
+# creating a separate file to make sure that all previous permissions are removed
 chmod 700 "${tmpdir}"
 touch "${tmpdir}"/final
 chmod 600 "${tmpdir}"/final
