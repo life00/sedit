@@ -77,7 +77,7 @@ if diff --color "${1}" "${tmpdir}"/final; then
 	exit 0
 else
 	# confirming changes
-	printf "${dgray}[${blue}?${dgray}] :${lgray}%s${dgray}:${nc} Apply changes? ${dgray}[${green}y${dgray}/${red}N${dgray}]: ${bold}" "${vcode}"
+	printf "${dgray}[${blue}?${dgray}] :${lgray}%s${dgray}:${nc} Apply changes? ${dgray}[${green}y${dgray}/${red}N${dgray}]: ${nc}${bold}" "${vcode}"
 	read -r resp
 	printf "${nc}\n"
 	if [ "${resp}" = "y" ] || [ "${resp}" = "Y" ]; then
