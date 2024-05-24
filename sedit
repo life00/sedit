@@ -2,7 +2,7 @@
 
 # setting environment variables
 user="user"
-EDITOR="${EDITOR:-/bin/vi}"
+EDITOR="${EDITOR:-/usr/bin/vi}"
 vcode="" # validity passcode to verify the session
 
 # define colors for logging
@@ -16,13 +16,13 @@ lgray="\e[0;97m"
 
 # error checking
 if [ -n "${2}" ]; then
-	printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} Expected only one argument.\n" "${vcode}"
+	/usr/bin/printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} Expected only one argument.\n" "${vcode}"
 	exit 1
 elif [ -z "${1}" ]; then
-	printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} No file path provided.\n" "${vcode}"
+	/usr/bin/printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} No file path provided.\n" "${vcode}"
 	exit 1
-elif [ "$(id -u)" -ne 0 ]; then
-	printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} Should be run as root.\n" "${vcode}"
+elif [ "$(/usr/bin/id -u)" -ne 0 ]; then
+	/usr/bin/printf "${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} Should be run as root.\n" "${vcode}"
 	exit 1
 fi
 
@@ -31,40 +31,40 @@ fi
 set -eu
 
 # temporary directory
-tmpdir="$(mktemp -d)"
+tmpdir="$(/bin/mktemp -d)"
 
 # remove temporary directory when script exits
-trap "rm -rf '${tmpdir}'" EXIT
+trap "/bin/rm -rf '${tmpdir}'" EXIT
 
 # copy file and set appropriate permissions
-chmod 755 "${tmpdir}"
-touch "${tmpdir}"/edit
-chmod 600 "${tmpdir}"/edit
-chown "${user}":"${user}" "${tmpdir}"/edit
-cat "${1}" >"${tmpdir}"/edit
+/bin/chmod 755 "${tmpdir}"
+/bin/touch "${tmpdir}"/edit
+/bin/chmod 600 "${tmpdir}"/edit
+/bin/chown "${user}":"${user}" "${tmpdir}"/edit
+/bin/cat "${1}" >"${tmpdir}"/edit
 
 # open file in ${EDITOR} as ${user}
 
 # use machinectl if you are on a systemd system (recommended); arguably it is the most secure method
-machinectl -q shell "${user}"@.host "${EDITOR}" "${tmpdir}"/edit
+/usr/bin/machinectl -q shell "${user}"@.host "${EDITOR}" "${tmpdir}"/edit
 
 # use GNU su when you are using GNU coreutils; arguably it is less secure method
-# su "${user}" -P -s /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
+# /bin/su "${user}" -P -s /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
 
 # use sudo if you have it installed; its about the same security as using su
 # IMPORTANT: make sure you have 1.9.14< version installed so that use_pty is used by default
 # otherwise using sudo to spawn unprivileged session is NOT SAFE and is vulnerable to privilege escalation exploit
 # the default state of this option might change in the future versions so its better to set it explicitly in the config anyways
-# sudo -u "${user}" /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
+# /usr/bin/sudo -u "${user}" /bin/sh -c '"${1}" "${2}"' sedit "${EDITOR}" "${tmpdir}"/edit
 
 # reverse permission changes
 # creating a separate file to make sure that all previous permissions are removed
-chmod 700 "${tmpdir}"
-touch "${tmpdir}"/final
-chmod 600 "${tmpdir}"/final
-chown "root:root" "${tmpdir}"/edit
-chmod 600 "${tmpdir}"/edit
-cat "${tmpdir}"/edit >"${tmpdir}"/final
+/bin/chmod 700 "${tmpdir}"
+/bin/touch "${tmpdir}"/final
+/bin/chmod 600 "${tmpdir}"/final
+/bin/chown "root:root" "${tmpdir}"/edit
+/bin/chmod 600 "${tmpdir}"/edit
+/bin/cat "${tmpdir}"/edit >"${tmpdir}"/final
 
 # checking for changes
 # the original file is not copied to temporary directory because I believe it is unnecessary
@@ -72,17 +72,17 @@ cat "${tmpdir}"/edit >"${tmpdir}"/final
 # if something does then it will be visible in the diff
 
 # check difference with diff and also use its output
-if diff --color "${1}" "${tmpdir}"/final; then
-	printf "${dgray}[${green}+${dgray}] :${lgray}%s${dgray}:${nc} No changes made.\n" "${vcode}"
+if /usr/bin/diff --color "${1}" "${tmpdir}"/final; then
+	/usr/bin/printf "${dgray}[${green}+${dgray}] :${lgray}%s${dgray}:${nc} No changes made.\n" "${vcode}"
 	exit 0
 else
 	# confirming changes
-	printf "${dgray}[${blue}?${dgray}] :${lgray}%s${dgray}:${nc} Apply changes? ${dgray}[${green}y${dgray}/${red}N${dgray}]: ${nc}${bold}" "${vcode}"
+	/usr/bin/printf "${dgray}[${blue}?${dgray}] :${lgray}%s${dgray}:${nc} Apply changes? ${dgray}[${green}y${dgray}/${red}N${dgray}]: ${nc}${bold}" "${vcode}"
 	read -r resp
-	printf "${nc}\n"
+	/usr/bin/printf "${nc}\n"
 	if [ "${resp}" = "y" ] || [ "${resp}" = "Y" ]; then
 		# overwrite the original file
-		cat "${tmpdir}"/final >"${1}"
+		/bin/cat "${tmpdir}"/final >"${1}"
 		exit 0
 	else
 		exit 1
