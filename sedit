@@ -30,6 +30,9 @@ fi
 # error when using unset variables
 set -eu
 
+# set default umask file permissions
+umask 077
+
 # temporary directory
 tmpdir="$(/bin/mktemp -d)"
 
