@@ -121,3 +121,6 @@ Also, special thanks to all the volunteers and code reviewers that contributed t
   - reported race condition critical vulnerability: `58c3ea1`
   - suggested better permission management of temporary directory and files: `3f43782`
   - suggested validity passcode security feature: `3a18fae`
+- [chovanecadam](https://github.com/chovanecadam)
+  - suggested to set absolute paths for all commands: `1d53303`
+  - suggested to set default `umask` file permissions: `4023b3e`
