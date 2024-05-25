@@ -36,7 +36,11 @@ umask 077
 # temporary directory
 tmpdir="$(/bin/mktemp -d)"
 
+# properly handle INT and TERM signals
+trap "printf '\n${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} Received INT signal.\n' '${vcode}'" INT
+trap "printf '\n${dgray}[${red}!${dgray}] :${lgray}%s${dgray}:${nc} Received TERM signal.\n' '${vcode}'" TERM
 # remove temporary directory when script exits
+# it will also run when INT or TERM signals are received
 trap "/bin/rm -rf '${tmpdir}'" EXIT
 
 # copy file and set appropriate permissions
