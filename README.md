@@ -14,7 +14,7 @@
 
 A minimal POSIX shell script[^2] that allows you to securely edit any file as root with your preferred unprivileged editor.
 
-[^2]: However it still depends on a non-POSIX program, see the end of [Design section](#design)
+[^2]: However it still depends on a non-POSIX editor launching program, see the end of [Securely launching the editor section](#securely-launching-the-editor), and also cosmetic features such as colored `diff` output and colored `printf` output may not always be supported, so you might need to patch SEdit if necessary
 
 ## Disclaimer
 
