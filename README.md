@@ -49,17 +49,18 @@ Thanks to the minimal, concise, and POSIX-compliant code of the [original projec
 
 By far the hardest challenge was to figure out how to securely launch and properly isolated the untrusted editor. From the beginning of development I was concerned about this process given that this is the main potential attack surface. After initial launch I received a report on matrix by user freedumbo (@freedumbo:arcticfoxes.net) who claimed that a threat actor who already compromised the editor program may easily gain root privileges by exploiting the way I use `su` to launch the editor. I was a bit surprised to say the least that it is possible to do it so easily. freedumbo has also provided me with a lot of resources explaining how it works and possible solutions to patch it.
 
-The vulnerability is officially called _TTY pushback_ which is essentially about somehow escaping the unprivileged shell to the original root shell by exploiting the weaknesses in the environment. You may read more details about this in [these](https://www.halfdog.net/Security/2012/TtyPushbackPrivilegeEscalation/) [two](https://www.errno.fr/TTYPushback.html) articles. In the second article the solution presented is to use the `-P` argument for `su`, which solves this particular issue however it does solve the fundamental problem. In [one issue](https://github.com/systemd/systemd/issues/7451#issuecomment-346787237) poettering has suggested that the proper way of creating a clean environment is to use `machinectl shell` because the only right way a fully isolated session may be created is by the init system. I would probably agree with this statement given that is the core of the system that manages all the sessions, which also means that using `su` and similar to create an unprivileged session from privileged session may be fundamentally a bad idea.
+The vulnerability is officially called _TTY pushback_ which is essentially about somehow escaping the unprivileged shell to the original root shell by exploiting the weaknesses in the environment. You may read more details about this in [these](https://www.halfdog.net/Security/2012/TtyPushbackPrivilegeEscalation/) [two](https://www.errno.fr/TTYPushback.html) articles. In the second article the solution presented is to use the `-P` argument for `su`, which solves this particular issue however it does solve the fundamental problem. In [one issue](https://github.com/systemd/systemd/issues/7451#issuecomment-346787237) poettering has suggested that the proper way of creating a clean environment is to use `machinectl shell` because the only right way a fully isolated session may be created is by the init system. I would probably agree with this statement given that is the core of the system that manages all the sessions, which also means that using `su` and similar to create an unprivileged session from privileged session may be fundamentally a bad idea. More recently, I discovered a new systemd utility (available since v256) called [`run0`](https://www.freedesktop.org/software/systemd/man/256/run0.html) which is effectively a secure `sudo` replacement that aims to address this issue.
 
 After a bit more research I discovered that the same TTY pushback issue applies to [sudo](https://www.suse.com/support/kb/doc/?id=000021241) and [doas](https://github.com/Duncaen/OpenDoas/issues/106) where sudo [has a solution to this](https://github.com/sudo-project/sudo/issues/258) which is enabled by default while doas still does not.
 
-I have addressed this problem by choosing the `machinectl` method as default, which means by default SEdit is dependent on systemd. I have also created an implementation for GNU `su` (but with `-P` argument) and `sudo` (it has this option enabled by default from 1.9.14 version, but users are still encouraged to enable `use_pty` option explicitly in config in case the default state changes in future versions), but this code is commented out by default. Users may choose which launching method they prefer, however I believe `machinectl` is the most secure method which is why it is the default. freedumbo has also suggested to use an ssh server to securely run the untrusted editor, however I believe this would require too much setup and don't think client OS's usually have an ssh server running (SEdit would probably be used more in client OS's), so I did not implement this option.
+I have addressed this problem by choosing the `run0` method as default and `machinectl` as a backup option (commented out) for older systemd versions, which means by default SEdit is dependent on systemd. I have also created an implementation for GNU `su` (but with `-P` argument) and `sudo` (it has this option enabled by default from 1.9.14 version, but users are still encouraged to enable `use_pty` option explicitly in config in case the default state changes in future versions), but this code is commented out by default. Users may choose which launching method they prefer, however I believe `run0` is the most secure method which is why it is the default. freedumbo has also suggested to use an ssh server to securely run the untrusted editor, however I believe this would require too much setup and `run0` is effectively equivalent, so I did not implement this option.
 
 ## Requirements
 
 - POSIX-compliant system
 - launching program options
-  - `systemd-container`: `machinectl` (default and recommended)
+  - `systemd`: `run0` (default and recommended)
+  - `systemd-container`: `machinectl` (recommended for older systemd versions)
   - GNU core utils: `su`
   - `sudo`
 
@@ -79,7 +80,8 @@ Before using `sedit` you are strongly advised to read the documentation (this re
    - `vcode` - the validity passcode to verify the validity of the session
      - it is set by the user, and it is supposed to be a temporary passcode specifically used for SEdit
 5. Choose your preferred launching program by (un)commenting sections of the code if necessary: `vi /usr/local/sbin/sedit`
-   - `systemd-container`: `machinectl` (default and recommended)
+   - `systemd`: `run0` (default and recommended)
+   - `systemd-container`: `machinectl` (recommended for older systemd versions)
    - GNU `su`
    - `sudo`
 
